@@ -9,16 +9,18 @@ class InputValidatorService {
         $response = [];
 
         $rules = [
-            "property_price" => 'required',
-            "down_payment" => 'required | gt:0',
-            "annual_interest_rate" => 'required',
-            "amortization_period" => 'required',
-            "payment_schedule" => 'required |in:"accelerated", "bi-weekly", "monthly"',
+            "property_price" => 'required|numeric|between:0,999999999',
+            "down_payment" => 'required|numeric|between:0,999999999',
+            "annual_interest_rate" => 'required|numeric|between:1,100',
+            "amortization_period" => 'required|numeric|between:5,30',
+            "payment_schedule" => 'required|in:"accelerated", "bi-weekly", "monthly"',
         ];
 
         $messages = [
             'required' => "The field :attribute is required",
-            'in' => "Payment schedule should be 'accelerated', 'bi-weekly' or 'monthly'"
+            'in' => "Payment schedule should be 'accelerated', 'bi-weekly' or 'monthly'",
+            'between' => "The field :attribute must be greater than :min and less than :max ",
+            'numeric' => "The field :attribute must be a number"
         ];
 
         $validator = Validator::make($data, $rules, $messages);
