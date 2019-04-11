@@ -47,8 +47,8 @@ class CalculatorController extends Controller {
         $validateInputMessage = InputValidatorService::validateInput($downPayment, $propertyPrice, $data);
         
         if ($validateInputMessage) {
-            $response = ["message" => $validateInputMessage];
-            return response(json_encode($response), 400)
+            $response = ["error" => $validateInputMessage];
+            return response($response, 400)
                 ->header('Content-Type', 'application/json');
         }
 
@@ -65,7 +65,7 @@ class CalculatorController extends Controller {
             $payments["payment_schedule"]["$i"] = $payment;
         }
         
-        return response(json_encode($payments), 200)
+        return response($payments, 200)
                 ->header('Content-Type', 'application/json');
     }
 }

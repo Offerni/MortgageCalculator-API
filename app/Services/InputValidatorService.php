@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Validator;
 class InputValidatorService {
     static function validateInput($downPayment, $principal, $data) {
         $minDownPayment = 0.05;
+        $response = [];
 
         $rules = [
             "property_price" => 'required',
@@ -23,22 +24,33 @@ class InputValidatorService {
         $validator = Validator::make($data, $rules, $messages);
 
         if ($validator->fails()) {
-            return response($validator->errors()->first(), 400);
+            
+            $fields = []; 
+            foreach ($validator->messages()->toArray() as $key => $value) { 
+                $obj = [];
+                $obj['field'] = $key; 
+                $obj['message'] = $value[0];
+                
+                $fields[] = $obj; 
+            }
+
+
+           $response["fields"] = $fields;
         }
 
 
-        if ($downPayment < $principal * $minDownPayment && $principal < 1000000) {
-            return "Down Payment has to be at least $" . $principal * $minDownPayment;
+        if ($downPayment < ($principal * $minDownPayment) && $principal < 1000000) {
+            $response["messages"][] = "Down Payment has to be at least $" . $principal * $minDownPayment;
         }
 
-        if ($principal >= 1000000 && $downPayment < $principal * 0.2) {
-            return "Houses over 1 Million requires a 20% down payment. Required amout: $" . $principal * $minDownPayment;
+        if ($principal >= 1000000 && $downPayment < ($principal * 0.2)) {
+            $response["messages"][] = "Houses over 1 Million requires a 20% down payment. Required amount: $" . $principal * 0.2;
         }
 
         if ($principal <= $downPayment) {
-            return "Principal Cannot be less than the Down Payment";
+            $response["messages"][] = "Property price Cannot be less than the Down Payment";
         }
          
-        return null;
+        return $response;
     }
 }
